@@ -1,0 +1,4 @@
+
+*.png
+*.jpeg
+.ipynb_checkpoints/sweep base-checkpoint.ipynb
