@@ -2,6 +2,7 @@ from glob import glob
 import torch
 from torchvision.io import read_image
 from torch.utils.data import Dataset
+from torchvision.transforms import Resize
 
 
 def biggest_less(sorted_list, target):
@@ -29,6 +30,8 @@ class ImageTriplets(Dataset):
 
         self.all_locations = []
         self.total_images = 0
+
+        self.resize = Resize((360, 360))
 
         for cls in glob(f"{data_path}/*"):
             cls_clear = cls.split('/')[-1]
@@ -75,9 +78,13 @@ class ImageTriplets(Dataset):
         image2 = read_image(self.all_locations[cls_index][obj_index][pic2])/255.0
         image3 = read_image(self.all_locations[cls_index][obj_index][pic3])/255.0
 
+        image1 = self.resize(image1).float()
+        image2 = self.resize(image2).float()
+        image3 = self.resize(image3).float()
+
         target = torch.nn.functional.one_hot(torch.tensor(cls_index), num_classes=self.DETECTION_CLASSES)
 
-        return (image1, image2, image3), target
+        return (image1, image2, image3), target.float()
 
     def _get_single(self, index):
         cls_index = biggest_less(self.class_layer, index)
@@ -85,6 +92,8 @@ class ImageTriplets(Dataset):
         pic_index = index - self.objects_layer[cls_index][obj_index]
 
         image = read_image(self.all_locations[cls_index][obj_index][pic_index])/255.0
+        image = self.resize(image).float()
+
         target = torch.nn.functional.one_hot(torch.tensor(cls_index), num_classes=self.DETECTION_CLASSES)
 
-        return image, target
+        return image, target.float()
