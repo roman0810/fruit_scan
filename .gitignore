@@ -3,3 +3,4 @@
 *.jpeg
 .ipynb_checkpoints/sweep base-checkpoint.ipynb
 *.jpg
+*.pyc
